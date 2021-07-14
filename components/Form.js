@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, TouchableHighlight, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
 
-const Form = () => {
-  // List of cryptos from API
+const Form = ({ coin, crypto, setCoin, setCrypto, setCallAPI }) => {
   const [cryptos, setCryptos] = useState([]);
-
-  // Selected coins
-  const [coin, setCoin] = useState('');
-  const [crypto, setCrypto] = useState('');
 
   useEffect(() => {
     const callAPI = async () => {
@@ -26,6 +21,27 @@ const Form = () => {
 
   const selectCrypto = crypto => {
     setCrypto(crypto);
+  }
+
+  const quotePrice = () => {
+    // Validation error
+    if (coin.trim() === '' || crypto.trim() === '') {
+      showAlert();
+      return;
+    }
+
+    // Validation success
+    setCallAPI(true);
+  }
+
+  const showAlert = () => {
+    Alert.alert(
+      'Error',
+      'Ambos campos son obligatorios',
+      [
+        {text: 'OK'}
+      ]
+    );
   }
 
   return (
@@ -54,6 +70,13 @@ const Form = () => {
           <Picker.Item key={crypto.CoinInfo.Id} label={crypto.CoinInfo.FullName} value={crypto.CoinInfo.Name} />
         ))}
       </Picker>
+
+      <TouchableHighlight style={styles.btnQuote} onPress={() => quotePrice()}>
+        <Text style={styles.txtQuote}>Cotizar</Text>
+      </TouchableHighlight>
+
+      <Text>Moneda: {coin}</Text>
+      <Text>Crypto: {crypto}</Text>
     </View>
   );
 };
@@ -64,6 +87,18 @@ const styles = StyleSheet.create({
     fontSize: 22,
     textTransform: 'uppercase',
     marginVertical: 20
+  },
+  btnQuote: {
+    backgroundColor: '#5e49e2',
+    padding: 10,
+    marginTop: 20
+  },
+  txtQuote: {
+    color: '#fff',
+    fontSize: 18,
+    fontFamily: 'Lato-Black',
+    textTransform: 'uppercase',
+    textAlign: 'center'
   }
 });
 
