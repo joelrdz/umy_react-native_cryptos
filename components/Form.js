@@ -3,36 +3,20 @@ import { StyleSheet, View, Text, TouchableHighlight, Alert } from 'react-native'
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
 
-const Form = ({ coin, crypto, setCoin, setCrypto, setCallAPI }) => {
+const Form = ({ coin, crypto, setCoin, setCrypto, setFormValid }) => {
   const [cryptos, setCryptos] = useState([]);
 
   useEffect(() => {
-    const callAPI = async () => {
+    const fetchCryptos = async () => {
       const url = 'https://min-api.cryptocompare.com/data/top/mktcapfull?limit=10&tsym=USD';
       const result = await axios.get(url);
       setCryptos(result.data.Data);
     }
-    callAPI();
+    fetchCryptos();
   }, []);
 
-  const selectCoin = coin => {
-    setCoin(coin);
-  }
-
-  const selectCrypto = crypto => {
-    setCrypto(crypto);
-  }
-
-  const quotePrice = () => {
-    // Validation error
-    if (coin.trim() === '' || crypto.trim() === '') {
-      showAlert();
-      return;
-    }
-
-    // Validation success
-    setCallAPI(true);
-  }
+  const selectCoin = coin => {setCoin(coin)}
+  const selectCrypto = crypto => {setCrypto(crypto)}
 
   const showAlert = () => {
     Alert.alert(
@@ -42,6 +26,17 @@ const Form = ({ coin, crypto, setCoin, setCrypto, setCallAPI }) => {
         {text: 'OK'}
       ]
     );
+  }
+
+  const validateForm = () => {
+    // Validation error
+    if (coin.trim() === '' || crypto.trim() === '') {
+      showAlert();
+      return;
+    }
+
+    // Validation success
+    setFormValid(true);
   }
 
   return (
@@ -71,12 +66,9 @@ const Form = ({ coin, crypto, setCoin, setCrypto, setCallAPI }) => {
         ))}
       </Picker>
 
-      <TouchableHighlight style={styles.btnQuote} onPress={() => quotePrice()}>
+      <TouchableHighlight style={styles.btnQuote} onPress={() => validateForm()}>
         <Text style={styles.txtQuote}>Cotizar</Text>
       </TouchableHighlight>
-
-      <Text>Moneda: {coin}</Text>
-      <Text>Crypto: {crypto}</Text>
     </View>
   );
 };
